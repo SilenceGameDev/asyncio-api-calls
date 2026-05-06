@@ -57,8 +57,6 @@ class Bible(BaseModel):
         return random_bible_verses
 
 
-
-
 def main():
     bible = Bible()
     asyncio.run(bible.get_random_bible_verses(amount_of_verses=5))
@@ -66,6 +64,7 @@ def main():
 if __name__ == "__main__":
     main()
 
+# used to quickly test the api
 # async def main():
 #     bible = Bible()
 #     async with aiohttp.ClientSession() as session:
