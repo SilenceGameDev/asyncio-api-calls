@@ -48,7 +48,7 @@ class Currency(BaseModel):
             currency_symbol,
         ]
         # not including symbol since it caused errors from encoding.
-        logger.info(f"Currency details. Name: {currency_details[0]}. IsoCode: {currency_details[1]}. Rate: {currency_details[2]}")
+        logger.info(f"Currency details. Name: {currency_details[0]}. IsoCode: {currency_details[1]}. Rate: {currency_details[2]} Symbol: {currency_details[3]}")
         return currency_details
 
     async def get_random_currencies(self, amount_of_currencies):

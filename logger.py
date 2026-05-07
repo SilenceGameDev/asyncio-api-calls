@@ -1,12 +1,16 @@
 import logging
-
+import sys
+import os
 from rich.logging import RichHandler
 
 logger = logging.getLogger(__name__)
 
+# Some characters can't be read by default so adding utf-8 encoding
+sys.stdout.reconfigure(encoding="utf-8")
+
 # the handler determines where the log go: stdout/file
 shell_handler = RichHandler() # shows logs in shell
-file_handler = logging.FileHandler("debug.log") # show logs in a separate file # removing file handler since it clashed with vercel
+file_handler = logging.FileHandler("debug.log", encoding="utf-8") # show logs in a separate file # removing file handler since it clashed with vercel
 
 # used to configure the level to send out
 logger.setLevel(logging.DEBUG)
