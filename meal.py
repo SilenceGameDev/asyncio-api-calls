@@ -4,18 +4,21 @@ import asyncio
 import aiohttp
 import time
 
+API_REQUEST_LIMIT = 4
+
 class Meal(BaseModel):
     RANDOM_MEAL_ENDPOINT:str = "https://www.themealdb.com/api/json/v1/1/random.php"
 
 
-    async def get_random_meal(self, session: aiohttp.ClientSession) -> dict:
-        async with session.get(url=self.RANDOM_MEAL_ENDPOINT) as response:
-            logger.info(f"Response code: {response.status}")
-            response.raise_for_status()
-            data = await response.json()
-            random_meal = data['meals'][0]
-            logger.info(f"Got Random Meal: {random_meal['strMeal']}")
-            return random_meal
+    async def get_random_meal(self, session: aiohttp.ClientSession, semaphore: asyncio.Semaphore) -> dict:
+        async with semaphore:
+            async with session.get(url=self.RANDOM_MEAL_ENDPOINT) as response:
+                logger.info(f"Response code: {response.status}")
+                response.raise_for_status()
+                data = await response.json()
+                random_meal = data['meals'][0]
+                logger.info(f"Got Random Meal: {random_meal['strMeal']}")
+                return random_meal
 
     def get_random_meal_details(self, random_meal)-> list:
         meal_name = random_meal["strMeal"]
@@ -30,11 +33,12 @@ class Meal(BaseModel):
         return meal_contents
 
     async def get_random_meals(self, amount_of_meals) -> list:
+        semaphore = asyncio.Semaphore(API_REQUEST_LIMIT)
         start_time = time.perf_counter()
 
         async with aiohttp.ClientSession() as session:
             async with asyncio.TaskGroup() as tg:
-                tasks = [tg.create_task(self.get_random_meal(session)) for _ in range(amount_of_meals)]
+                tasks = [tg.create_task(self.get_random_meal(session, semaphore)) for _ in range(amount_of_meals)]
 
         proc_start_time = time.perf_counter()
 
@@ -54,10 +58,3 @@ class Meal(BaseModel):
 
         logger.info(f"Got {amount_of_meals} random meals.\n--------------------------")
         return random_meals
-
-def main():
-    meal_api = Meal()
-    asyncio.run(meal_api.get_random_meals(15))
-
-if __name__ == "__main__":
-    main()

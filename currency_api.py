@@ -6,19 +6,22 @@ import time
 from aiohttp import ClientResponseError
 import random
 
+API_REQUEST_LIMIT = 4
+
 class Currency(BaseModel):
     # Currency rates are based off of the US Dollar
     CURRENCY_RATES_ENDPOINT:str = "https://api.frankfurter.dev/v2/rates?base=USD"
 
-    async def get_currency_rates(self, session: aiohttp.ClientSession):
-        async with session.get(self.CURRENCY_RATES_ENDPOINT) as response:
-            try:
-                response.raise_for_status()
-                logger.info(f"Response code: {response.status}")
-                currency_rates = await response.json()
-            except ClientResponseError:
-                logger.error(f"Got error: {response.status}")
-            return currency_rates
+    async def get_currency_rates(self, session: aiohttp.ClientSession, semaphore: asyncio.Semaphore):
+        async with semaphore:
+            async with session.get(self.CURRENCY_RATES_ENDPOINT) as response:
+                try:
+                    response.raise_for_status()
+                    logger.info(f"Response code: {response.status}")
+                    currency_rates = await response.json()
+                except ClientResponseError:
+                    logger.error(f"Got error: {response.status}")
+                return currency_rates
 
     async def get_currency(self, session: aiohttp.ClientSession, currency_endpoint):
         async with session.get(currency_endpoint) as response:
@@ -52,9 +55,10 @@ class Currency(BaseModel):
         return currency_details
 
     async def get_random_currencies(self, amount_of_currencies):
+        semaphore = asyncio.Semaphore(API_REQUEST_LIMIT)
         async with aiohttp.ClientSession() as session:
             # only need to do this once as it pulls all the currencies
-            currency_rates_result = await self.get_currency_rates(session)
+            currency_rates_result = await self.get_currency_rates(session, semaphore)
             random_currencies = []
             for _ in range(amount_of_currencies):
                 random_currency_rate = self.get_random_currency_rate(currency_rates_result)
@@ -65,26 +69,3 @@ class Currency(BaseModel):
 
         logger.info(f"Got {amount_of_currencies} random currencies.\n--------------------------")
         return random_currencies
-
-
-# used to quickly test the api
-# async def main():
-#     currency = Currency()
-#     async with aiohttp.ClientSession() as session:
-#         currency_rates_result = await currency.get_currency_rates(session)  # await not asyncio.run()
-#         random_currency_rate = currency.get_random_currency_rate(currency_rates_result)
-#         currency.currency_iso_code = random_currency_rate["quote"]
-#         currency.currency_endpoint = f"https://api.frankfurter.dev/v2/currency/{currency.currency_iso_code}"
-#         currency_result = await currency.get_currency(session)
-#         currency_details = currency.get_currency_details(random_currency_rate, currency_result)
-#         print(currency_details)
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())  # asyncio.run() goes here at the entry point only
-
-def main():
-    currency = Currency()
-    asyncio.run(currency.get_random_currencies(amount_of_currencies=5))
-
-if __name__ == "__main__":
-    main()

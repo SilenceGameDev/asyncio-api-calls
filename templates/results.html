@@ -1,0 +1,11 @@
+<div>
+    {% for api_result in api_results %}
+    <h3> {{ api_result[0][0] }}</h3>
+    <p>
+        <span class="image left">
+            <img src="{{ api_result[0][1] }}" alt="result image">
+        </span>
+        {{ api_result[0][2] }}
+    </p>
+    {% endif %}
+</div>

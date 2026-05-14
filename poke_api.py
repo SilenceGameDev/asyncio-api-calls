@@ -5,16 +5,19 @@ import aiohttp
 import time
 import random
 
+API_REQUEST_LIMIT = 4
+
 class Pokemon(BaseModel):
     pokemon_endpoint:str = "https://pokeapi.co/api/v2/pokemon/"
 
-    async def get_random_pokemon(self, session: aiohttp.ClientSession) -> dict:
-        random_pokemon_endpoint = self.get_random_pokemon_endpoint()
-        async with session.get(random_pokemon_endpoint) as response:
-            logger.info(f"Response code: {response.status}")
-            response.raise_for_status()
-            random_pokemon_data = await response.json()
-            return random_pokemon_data
+    async def get_random_pokemon(self, session: aiohttp.ClientSession, semaphore: asyncio.Semaphore) -> dict:
+        async with semaphore:
+            random_pokemon_endpoint = self.get_random_pokemon_endpoint()
+            async with session.get(random_pokemon_endpoint) as response:
+                logger.info(f"Response code: {response.status}")
+                response.raise_for_status()
+                random_pokemon_data = await response.json()
+                return random_pokemon_data
 
     def get_random_pokemon_endpoint(self) -> str:
         random_pokemon_id = random.randint(1, 1025)
@@ -24,7 +27,7 @@ class Pokemon(BaseModel):
 
     def get_pokemon_details(self, pokemon) -> list:
         pokemon_details = [
-            pokemon["forms"][0]["name"],
+            pokemon["species"]["name"].title(),
             pokemon["sprites"]["front_default"],
             pokemon["types"][0]["type"]["name"]
         ]
@@ -35,11 +38,12 @@ class Pokemon(BaseModel):
 
 
     async def get_multiple_random_pokemon(self, amount_of_random_pokemon: int) -> list:
+        semaphore = asyncio.Semaphore(API_REQUEST_LIMIT)
         start_time = time.perf_counter()
 
         async with aiohttp.ClientSession() as session:
             async with asyncio.TaskGroup() as tg:
-                tasks = [tg.create_task(self.get_random_pokemon(session)) for _ in range(amount_of_random_pokemon)]
+                tasks = [tg.create_task(self.get_random_pokemon(session,semaphore)) for _ in range(amount_of_random_pokemon)]
 
         proc_start_time = time.perf_counter()
 
@@ -60,9 +64,3 @@ class Pokemon(BaseModel):
         logger.info(f"Got {amount_of_random_pokemon} random pokemon.\n--------------------------")
         return multiple_random_pokemon
 
-def main():
-    pokemon = Pokemon()
-    asyncio.run(pokemon.get_multiple_random_pokemon(15))
-
-if __name__ == "__main__":
-    main()

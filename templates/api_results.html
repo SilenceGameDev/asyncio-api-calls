@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+    <title>Editorial by HTML5 UP</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="static/assets/css/main.css"/>
+</head>
+<body class="is-preload">
+
+<!-- Wrapper -->
+<div id="wrapper">
+
+    <!-- Main -->
+    <div id="main">
+        <div class="inner">
+
+            <!-- Header -->
+            {% include 'header.html' %}
+
+            <!-- Banner -->
+            <section id="banner">
+                <div class="content">
+                    <header>
+                        <h1>Results Page</h1>
+                        <p>A free and fully responsive site template</p>
+                    </header>
+                    <p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum
+                        congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris.
+                        Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac
+                        quam. Lorem ipsum dolor sit nullam.</p>
+                    <ul class="actions">
+                        <li><a href="#" class="button big">Learn More</a></li>
+                    </ul>
+                </div>
+                <span class="image object">
+										<img src="static/images/pic10.jpg" alt=""/>
+									</span>
+            </section>
+
+            <!-- Meal Section -->
+            <section id="meal">
+                <header class="major">
+                    <h2>Meals</h2>
+                </header>
+                {%for meal in meals: %}
+                <div class="posts" style="padding-left: 10px;">
+                    <h3> {{ meal[0]}}</h3>
+                    <p>
+                        <span class="{{ 'image left' if loop.index % 2 != 0 else 'image right' }}">
+                            <img src="{{ meal[1] }}">
+                        </span>
+                        {{ meal[2] }}
+                    </p>
+                </div>
+                {% endfor %}
+            </section>
+            <!-- Pokemon Section -->
+            <section id="pokemon">
+                <header class="major">
+                    <h2>Pokemon</h2>
+                </header>
+
+                    <div class="table-wrapper">
+                        <table class="alt">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Sprite</th>
+                                <th>Type 1</th>
+                                <th>Type 2</th>
+                            </tr>
+
+                            </thead>
+                            <tbody>
+                            {%for poke in pokemon: %}
+                            <tr>
+                                <td style="vertical-align: middle; text-align: center;"><a href="https://bulbapedia.bulbagarden.net/wiki/{{ poke[0]}}_(Pok%C3%A9mon)">{{
+                                    poke[0]}}</a></td>
+                                <td style="vertical-align: middle; text-align: center;"><a href="https://bulbapedia.bulbagarden.net/wiki/{{ poke[0]}}_(Pok%C3%A9mon)"><img src="{{ poke[1] }}" alt="pokemon sprite"></a></td>
+                                <td style="vertical-align: middle; text-align: center;">{{ poke[2]}}</td>
+                                {% if poke|length > 3 %}
+                                <td style="vertical-align: middle; text-align: center;">{{ poke[3] }}</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+            </section>
+
+            <!-- Bible Section -->
+            <section id="bible">
+                <header class="major">
+                    <h2>Bible Verses</h2>
+                </header>
+                {%for verse in bible_verses: %}
+                <dl>
+                    <dt>{{ verse[0] }} {{ verse[1]}}</dt>
+                    <dd>
+                        <p>Verse: {{ verse[2]}}</p>
+                        <p>{{ verse[3] }}</p>
+                    </dd>
+                </dl>
+                {% endfor %}
+            </section>
+
+            <!-- Currency Section -->
+            <section id="currency">
+                <header class="major">
+                    <h2>Currency</h2>
+                </header>
+                <div class="table-wrapper">
+                        <table class="alt">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Iso Code</th>
+                                <th>Amount Compared to USD</th>
+                                <th>Symbol</th>
+                            </tr>
+
+                            </thead>
+                            <tbody>
+                            {%for currency in currencies: %}
+                            <tr>
+                                <td>{{ currency[0]}}</td>
+                                <td>{{ currency[1]}}</td>
+                                <td>{{ currency[2]}}</td>
+                                <td>{{ currency[3]}}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+            </section>
+            <!-- Zelda Section -->
+            <section id="zelda">
+                <header class="major">
+                    <h2>Zelda Compendium</h2>
+                </header>
+                <div class="table-wrapper">
+                        <table class="alt">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Image</th>
+                                <th>Description</th>
+                            </tr>
+
+                            </thead>
+                            <tbody>
+                            {%for zelda_entry in zelda_entries: %}
+                            <tr>
+                                <td style="vertical-align: middle; text-align: center;">{{ zelda_entry[0]}}</td>
+                                <td><img src="{{ zelda_entry[1]}}" alt="Zelda Compendium Image"></td>
+                                <td style="vertical-align: middle; text-align: center;">{{ zelda_entry[2]}}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+
+            </section>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="inner">
+            <!-- Menu -->
+            <nav id="menu">
+                <header class="major">
+                    <h2>Menu</h2>
+                </header>
+                <ul>
+                    <li><a href="{{url_for('home')}}">Homepage</a></li>
+                    <li>
+                        <span class="opener active">API Results</span>
+                        <ul>
+                            <li><a href="#meal">Meals</a></li>
+                            <li><a href="#pokemon">Pokemon</a></li>
+                            <li><a href="#bible">Bible Verses</a></li>
+                            <li><a href="#currency">Currency</a></li>
+                            <li><a href="#zelda">Zelda</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </nav>
+
+            <!-- Footer -->
+            {% include 'footer.html' %}
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="static/assets/js/jquery.min.js"></script>
+<script src="static/assets/js/browser.min.js"></script>
+<script src="static/assets/js/breakpoints.min.js"></script>
+<script src="static/assets/js/util.js"></script>
+<script src="static/assets/js/main.js"></script>
+
+</body>
+</html>
